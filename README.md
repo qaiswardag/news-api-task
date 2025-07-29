@@ -1,24 +1,11 @@
-# Laravel News API
+# News API Project
 
-A Laravel REST API that manages countries, languages, and news categories, retrieves live news data from NewsData.io, and serves paginated news articles based on country, language, and category.
+This repository contains two main parts:
 
-## Features
+- **Backend**: Laravel REST API for managing countries, languages, categories, and news data.
+- **Frontend**: Vue 3 app for displaying countries and news data.
 
-- Manage countries, their languages, and news categories
-- Fetch live news from [NewsData.io](https://newsdata.io/)
-- RESTful endpoints with proper error handling
-- Paginated news article API
+## Quick Start
 
-## Requirements
-
-- PHP >= 8.1
-- Composer
-- Laravel >= 10
-
-## Setup
-
-1. **Clone the repository**
-
-   ```bash
-   git clone git@github.com:qaiswardag/news-api-task.git
-   ```
+- See [backend/README.md](backend/README.md) for backend setup and usage.
+- See [frontend/README.md](frontend/README.md) for frontend setup and usage.
