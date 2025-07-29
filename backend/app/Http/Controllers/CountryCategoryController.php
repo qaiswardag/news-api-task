@@ -29,8 +29,8 @@ class CountryCategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'country_code' => ['required', 'exists:countries,code', 'max:255'],
-            'category_id' => ['required', 'exists:categories,id', 'integer'],
+            'country_code' => ['required', 'exists:countries,code', 'string', 'max:255'],
+            'category_id' => ['required', 'exists:categories,id', 'integer', 'max:255'],
         ]);
 
         $country = Country::where('code', $request->country_code)->first();
@@ -78,8 +78,8 @@ class CountryCategoryController extends Controller
     public function destroy(Request $request)
     {
         $request->validate([
-            'country_code' => ['required', 'exists:countries,code', 'max:255'],
-            'category_id' => ['required', 'exists:categories,id', 'integer'],
+            'country_code' => ['required', 'exists:countries,code', 'string', 'max:255'],
+            'category_id' => ['required', 'exists:categories,id', 'integer', 'max:255'],
         ]);
 
         $country = Country::where('code', $request->country_code)->first();
