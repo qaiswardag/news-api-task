@@ -13,7 +13,7 @@ onMounted(async () => {
     const data = await res.json();
     news.value = data.data;
   } catch (e) {
-    error.value = e.message;
+    error.value = e.message + res.message;
   } finally {
     loading.value = false;
   }
@@ -21,7 +21,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 py-10">
+  <div class="font-['Jost'] min-h-screen bg-gray-50 py-10">
     <div class="max-w-4xl mx-auto">
       <h1 class="text-3xl font-bold mb-6 text-center text-myPrimaryLinkColor">
         Canada News
