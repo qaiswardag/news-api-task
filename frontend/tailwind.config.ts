@@ -5,11 +5,9 @@ import typography from '@tailwindcss/typography';
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    './css/style.css',
     './src/**/*.{vue,js,ts,jsx,tsx,json,html}',
     './public/json/**/*.json',
     './public/**/*.html',
-    './src/css/**/*.css',
   ],
   theme: {
     extend: {
