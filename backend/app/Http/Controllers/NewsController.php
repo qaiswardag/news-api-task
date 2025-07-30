@@ -60,7 +60,7 @@ class NewsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $countryCode, int $page = 1)
+    public function show(string $countryCode, ?string $nextPageToken = null)
     {
         $country = Country::where('code', $countryCode)
             ->with(['categories', 'languages'])
@@ -88,37 +88,35 @@ class NewsController extends Controller
             ], 400);
         }
 
-        $categoryParam = implode(',', $categories);
-        $languageParam = implode(',', $languages);
-
-        // return response()->json([
-        //     'country' => $countryCode,
-        //     'page'    => $page,
-        //     'languageParam'    => $languageParam,
-        //     'categoryParam'    => $categoryParam,
-        // ]);
-
-        $response = Http::get($url, [
+        $params = [
             'apikey'   => $key,
             'country'  => $countryCode,
-            'language' => $languageParam,
-            'category' => $categoryParam,
-            'page'     => $page,
-        ]);
+            'language' => implode(',', $languages),
+            'category' => implode(',', $categories),
+        ];
+
+        if ($nextPageToken !== null) {
+            $params['page'] = $nextPageToken;
+        }
+
+        $response = Http::get($url, $params);
 
         if ($response->failed()) {
             return response()->json([
                 'message' => 'Failed to fetch news data',
-                'error'   => $response->body()
+                'error'   => $response->body(),
             ], 500);
         }
 
+        $json = $response->json();
+
         return response()->json([
-            'country' => $countryCode,
-            'page'    => $page,
-            'data'    => $response->json()['results'] ?? [],
+            'country'  => $countryCode,
+            'nextPage' => $json['nextPage'] ?? null,
+            'data'     => $json['results'] ?? [],
         ]);
     }
+
 
     /**
      * Show the form for editing the specified resource.
