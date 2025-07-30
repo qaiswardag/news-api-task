@@ -7,7 +7,6 @@
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
 
 .vite
 .vscode
