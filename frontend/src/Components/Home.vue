@@ -58,7 +58,6 @@ const fetchNews = async (
     if (page) params.push(`page=${page}`);
     if (params.length) url += `?${params.join('&')}`;
     const res = await fetch(url);
-    console.log('url:', url);
     if (!res.ok) throw new Error('Failed to fetch news');
     const data = await res.json();
     // Handle nested data structure
