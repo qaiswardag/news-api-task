@@ -54,18 +54,18 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($countries as $data) {
-            $country = Country::create([
-                'name' => $data['name'],
-                'code' => $data['code'],
-            ]);
+            $country = Country::firstOrCreate(
+                ['code' => $data['code']],
+                ['name' => $data['name']]
+            );
 
             // Attach languages
             $langIds = Language::whereIn('language', $data['languages'])->pluck('id')->toArray();
-            $country->languages()->attach($langIds);
+            $country->languages()->sync($langIds);
 
             // Attach random categories
             $catIds = Category::inRandomOrder()->take(3)->pluck('id')->toArray();
-            $country->categories()->attach($catIds);
+            $country->categories()->sync($catIds);
         }
     }
 }

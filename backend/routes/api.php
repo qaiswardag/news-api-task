@@ -14,3 +14,5 @@ Route::post('/country-category', [CountryCategoryController::class, 'store']);
 Route::delete('/country-category', [CountryCategoryController::class, 'destroy']);
 
 Route::get('/news', [NewsController::class, 'index']);
+
+Route::get('/news/{country}/{page?}', [NewsController::class, 'show']);
