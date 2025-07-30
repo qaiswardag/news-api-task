@@ -11,15 +11,37 @@
 
 A Laravel REST API that manages countries, languages, and news categories, retrieves live news data from NewsData.io, and serves paginated news articles based on country, language, and category.
 
--   [Simple, fast routing engine](https://laravel.com/docs/routing).
--   [Powerful dependency injection container](https://laravel.com/docs/container).
--   Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
--   Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
--   Database agnostic [schema migrations](https://laravel.com/docs/migrations).
--   [Robust background job processing](https://laravel.com/docs/queues).
--   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Setup and Seed Database
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. **Create your database**  
+   Create a new database in your MySQL/PostgreSQL server for the project.
+
+2. **Configure environment variables**  
+   Copy `.env.example` to `.env` and update the database connection settings accordingly:
+
+    ```env
+    DB_DATABASE=your_database_name
+    DB_USERNAME=your_database_user
+    DB_PASSWORD=your_database_password
+    ```
+
+3. **Install dependencies**
+
+    ```bash
+    composer install
+    ```
+
+4. **Generate application key**
+
+    ```bash
+    php artisan key:generate
+    ```
+
+5. **Run migrations and seed database**  
+   This will create all tables and insert sample data:
+    ```bash
+    php artisan migrate:fresh --seed
+    ```
 
 ## Learning Laravel
 
@@ -35,14 +57,14 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 ### Premium Partners
 
--   **[Vehikl](https://vehikl.com)**
--   **[Tighten Co.](https://tighten.co)**
--   **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
--   **[64 Robots](https://64robots.com)**
--   **[Curotec](https://www.curotec.com/services/technologies/laravel)**
--   **[DevSquad](https://devsquad.com/hire-laravel-developers)**
--   **[Redberry](https://redberry.international/laravel-development)**
--   **[Active Logic](https://activelogic.com)**
+- **[Vehikl](https://vehikl.com)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development)**
+- **[Active Logic](https://activelogic.com)**
 
 ## Contributing
 
