@@ -1,11 +1,11 @@
-# News API Project
+# News API
 
 This repository contains two main parts:
 
 - **Backend**: Laravel REST API for managing countries, languages, categories, and news data.
 - **Frontend**: Vue 3 app for displaying countries and news data.
 
-[Demo](https://phpstack-1064434-5735052.cloudwaysapps.com)
+[Demo frontend for News API](https://phpstack-1064434-5735052.cloudwaysapps.com)
 
 ## Quick Start
 
