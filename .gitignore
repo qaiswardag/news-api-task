@@ -11,3 +11,5 @@
 
 .vite
 .vscode
+
+.env
