@@ -173,13 +173,13 @@ onMounted(() => {
             <div
               v-for="article in news"
               :key="article.article_id"
-              class="bg-white rounded-lg shadow p-6 flex flex-col md:flex-row gap-4"
+              class="bg-white rounded-lg shadow p-6 flex-col gap-4 flex flex-row"
             >
               <img
                 v-if="article.image_url"
                 :src="article.image_url"
                 alt="news image"
-                class="w-full md:w-48 h-32 object-cover rounded mb-4 md:mb-0"
+                class="h-32 w-48 object-cover rounded mb-4 md:mb-0"
               />
               <div class="flex-1">
                 <a
