@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 
 const apiURL = import.meta.env.VITE_API_URL;
 const news = ref([]);
+const nextPage = ref(null);
 const loading = ref(true);
 const error = ref(null);
 const countries = [
@@ -19,24 +20,28 @@ const selectedCountryName = computed(() => {
   return found ? found.name : '';
 });
 
-const fetchNews = async (countryCode) => {
+const fetchNews = async (countryCode, page = null, append = false) => {
   loading.value = true;
   error.value = null;
   try {
-    const res = await fetch(`${apiURL}/api/v1/news/${countryCode}`);
+    let url = `${apiURL}/api/v1/news/${countryCode}`;
+    if (page) url += `?page=${page}`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error('Failed to fetch news');
     const data = await res.json();
-    console.log('oki:', data);
     // Handle nested data structure
+    let articles = [];
     if (Array.isArray(data.data)) {
-      news.value = data.data;
+      articles = data.data;
     } else if (data.data && Array.isArray(data.data.data)) {
-      news.value = data.data.data;
-    } else {
-      news.value = [];
+      articles = data.data.data;
     }
-    console.log('news value:', news.value);
-    console.log('data:', data);
+    if (append) {
+      news.value = [...news.value, ...articles];
+    } else {
+      news.value = articles;
+    }
+    nextPage.value = data.nextPage || null;
   } catch (e) {
     error.value = e.message;
   } finally {
@@ -47,6 +52,13 @@ const fetchNews = async (countryCode) => {
 function handleCountryClick(code) {
   selectedCountry.value = code;
   fetchNews(code);
+  nextPage.value = null;
+}
+
+function loadMore() {
+  if (nextPage.value) {
+    fetchNews(selectedCountry.value, nextPage.value, true);
+  }
 }
 
 onMounted(() => {
@@ -56,6 +68,11 @@ onMounted(() => {
 
 <template>
   <div class="font-['Jost'] min-h-[120rem] bg-gray-50 py-10">
+    <h1
+      class="text-4xl font-medium flex items-center justify-center pt-8 pb-12"
+    >
+      Your Window to the World’s Latest News
+    </h1>
     <div class="max-w-4xl mx-auto">
       <div class="flex flex-wrap gap-2 justify-center mb-8">
         <button
@@ -75,8 +92,8 @@ onMounted(() => {
           {{ country.name }}
         </button>
       </div>
-      <h1 class="text-3xl font-bold mb-6 text-center text-myPrimaryLinkColor">
-        {{ selectedCountryName }} News
+      <h1 class="text-2xl font-medium mb-6 text-center text-myPrimaryLinkColor">
+        News from {{ selectedCountryName }}
       </h1>
       <div
         v-if="loading"
@@ -97,49 +114,59 @@ onMounted(() => {
         >
           No news found.
         </div>
-        <div
-          v-else
-          class="grid gap-6"
-        >
-          <div
-            v-for="article in news"
-            :key="article.article_id"
-            class="bg-white rounded-lg shadow p-6 flex flex-col md:flex-row gap-4"
-          >
-            <img
-              v-if="article.image_url"
-              :src="article.image_url"
-              alt="news image"
-              class="w-full md:w-48 h-32 object-cover rounded mb-4 md:mb-0"
-            />
-            <div class="flex-1">
-              <a
-                :href="article.link"
-                target="_blank"
-                class="text-xl font-semibold text-blue-700 hover:underline"
-                >{{ article.title }}</a
-              >
-              <div class="text-sm text-gray-500 mt-1 mb-2">
-                <span v-if="article.pubDate">{{
-                  new Date(article.pubDate).toLocaleString()
-                }}</span>
-                <span v-if="article.source_name">
-                  &middot; {{ article.source_name }}</span
+        <div v-else>
+          <div class="grid gap-6">
+            <div
+              v-for="article in news"
+              :key="article.article_id"
+              class="bg-white rounded-lg shadow p-6 flex flex-col md:flex-row gap-4"
+            >
+              <img
+                v-if="article.image_url"
+                :src="article.image_url"
+                alt="news image"
+                class="w-full md:w-48 h-32 object-cover rounded mb-4 md:mb-0"
+              />
+              <div class="flex-1">
+                <a
+                  :href="article.link"
+                  target="_blank"
+                  class="text-xl font-semibold text-blue-700 hover:underline"
+                  >{{ article.title }}</a
                 >
-              </div>
-              <p class="text-gray-700 mb-2">{{ article.description }}</p>
-              <div
-                v-if="article.keywords && article.keywords.length"
-                class="flex flex-wrap gap-2 mt-2"
-              >
-                <span
-                  v-for="kw in article.keywords"
-                  :key="kw"
-                  class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs"
-                  >{{ kw }}</span
+                <div class="text-sm text-gray-500 mt-1 mb-2">
+                  <span v-if="article.pubDate">{{
+                    new Date(article.pubDate).toLocaleString()
+                  }}</span>
+                  <span v-if="article.source_name">
+                    &middot; {{ article.source_name }}</span
+                  >
+                </div>
+                <p class="text-gray-700 mb-2">{{ article.description }}</p>
+                <div
+                  v-if="article.keywords && article.keywords.length"
+                  class="flex flex-wrap gap-2 mt-2"
                 >
+                  <span
+                    v-for="kw in article.keywords"
+                    :key="kw"
+                    class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs"
+                    >{{ kw }}</span
+                  >
+                </div>
               </div>
             </div>
+          </div>
+          <div
+            v-if="nextPage"
+            class="flex justify-center mt-8"
+          >
+            <button
+              @click="loadMore"
+              class="px-6 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 transition cursor-pointer"
+            >
+              Load More
+            </button>
           </div>
         </div>
       </div>
