@@ -1,30 +1,82 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 
 const apiURL = import.meta.env.VITE_API_URL;
 const news = ref([]);
 const loading = ref(true);
 const error = ref(null);
+const countries = [
+  { name: 'Belgium', code: 'be', languages: ['nl'] },
+  { name: 'Canada', code: 'ca', languages: ['en', 'fr'] },
+  { name: 'France', code: 'fr', languages: ['fr'] },
+  { name: 'Germany', code: 'de', languages: ['de'] },
+  { name: 'United Kingdom', code: 'gb', languages: ['en'] },
+];
 
-onMounted(async () => {
+const selectedCountry = ref('gb');
+const selectedCountryName = computed(() => {
+  const found = countries.find((c) => c.code === selectedCountry.value);
+  return found ? found.name : '';
+});
+
+const fetchNews = async (countryCode) => {
+  loading.value = true;
+  error.value = null;
   try {
-    const res = await fetch(`${apiURL}/api/v1/news/ca`);
+    const res = await fetch(`${apiURL}/api/v1/news/${countryCode}`);
     if (!res.ok) throw new Error('Failed to fetch news');
     const data = await res.json();
-    news.value = data.data;
+    console.log('oki:', data);
+    // Handle nested data structure
+    if (Array.isArray(data.data)) {
+      news.value = data.data;
+    } else if (data.data && Array.isArray(data.data.data)) {
+      news.value = data.data.data;
+    } else {
+      news.value = [];
+    }
+    console.log('news value:', news.value);
+    console.log('data:', data);
   } catch (e) {
-    error.value = e.message + res.message;
+    error.value = e.message;
   } finally {
     loading.value = false;
   }
+};
+
+function handleCountryClick(code) {
+  selectedCountry.value = code;
+  fetchNews(code);
+}
+
+onMounted(() => {
+  fetchNews(selectedCountry.value);
 });
 </script>
 
 <template>
-  <div class="font-['Jost'] min-h-screen bg-gray-50 py-10">
+  <div class="font-['Jost'] min-h-[120rem] bg-gray-50 py-10">
     <div class="max-w-4xl mx-auto">
+      <div class="flex flex-wrap gap-2 justify-center mb-8">
+        <button
+          v-for="country in countries"
+          :key="country.code"
+          @click="handleCountryClick(country.code)"
+          :class="[
+            'px-4 py-2 rounded-full border font-medium transition cursor-pointer',
+            selectedCountry === country.code
+              ? 'bg-blue-600 border-blue-600 shadow'
+              : 'bg-white text-blue-700 border-blue-300 hover:bg-blue-50',
+            selectedCountry === country.code
+              ? 'bg-gray-100 text-gray-900'
+              : 'text-gray-900',
+          ]"
+        >
+          {{ country.name }}
+        </button>
+      </div>
       <h1 class="text-3xl font-bold mb-6 text-center text-myPrimaryLinkColor">
-        Canada News
+        {{ selectedCountryName }} News
       </h1>
       <div
         v-if="loading"
