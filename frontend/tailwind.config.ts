@@ -9,6 +9,7 @@ export default {
     './src/**/*.{vue,js,ts,jsx,tsx,json,html}',
     './public/json/**/*.json',
     './public/**/*.html',
+    './src/css/**/*.css',
   ],
   theme: {
     extend: {

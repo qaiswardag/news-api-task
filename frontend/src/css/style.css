@@ -2,8 +2,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@layer components {
-  .myPrimaryWidget {
-    @apply py-8 px-4 border rounded-md bg-white;
-  }
-}
