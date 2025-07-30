@@ -6,6 +6,7 @@ const news = ref([]);
 const nextPage = ref(null);
 const loading = ref(true);
 const error = ref(null);
+
 const countries = [
   { name: 'Belgium', code: 'be', languages: ['nl'] },
   { name: 'Canada', code: 'ca', languages: ['en', 'fr'] },
@@ -14,19 +15,50 @@ const countries = [
   { name: 'United Kingdom', code: 'gb', languages: ['en'] },
 ];
 
+const categories = [
+  'business',
+  'crime',
+  'domestic',
+  'education',
+  'entertainment',
+  'environment',
+  'food',
+  'health',
+  'lifestyle',
+  'politics',
+  'science',
+  'sports',
+  'technology',
+  'top',
+  'tourism',
+  'world',
+  'other',
+];
+
+const selectedCategory = ref('top');
+
 const selectedCountry = ref('gb');
 const selectedCountryName = computed(() => {
   const found = countries.find((c) => c.code === selectedCountry.value);
   return found ? found.name : '';
 });
 
-const fetchNews = async (countryCode, page = null, append = false) => {
+const fetchNews = async (
+  countryCode,
+  page = null,
+  append = false,
+  category = null
+) => {
   loading.value = true;
   error.value = null;
   try {
     let url = `${apiURL}/api/v1/news/${countryCode}`;
-    if (page) url += `?page=${page}`;
+    const params = [];
+    if (category) params.push(`category=${category}`);
+    if (page) params.push(`page=${page}`);
+    if (params.length) url += `?${params.join('&')}`;
     const res = await fetch(url);
+    console.log('url:', url);
     if (!res.ok) throw new Error('Failed to fetch news');
     const data = await res.json();
     // Handle nested data structure
@@ -51,13 +83,24 @@ const fetchNews = async (countryCode, page = null, append = false) => {
 
 function handleCountryClick(code) {
   selectedCountry.value = code;
-  fetchNews(code);
+  fetchNews(code, null, false, selectedCategory.value);
+  nextPage.value = null;
+}
+
+function handleCategoryClick(cat) {
+  selectedCategory.value = cat;
+  fetchNews(selectedCountry.value, null, false, cat);
   nextPage.value = null;
 }
 
 function loadMore() {
   if (nextPage.value) {
-    fetchNews(selectedCountry.value, nextPage.value, true);
+    fetchNews(
+      selectedCountry.value,
+      nextPage.value,
+      true,
+      selectedCategory.value
+    );
   }
 }
 
@@ -82,14 +125,26 @@ onMounted(() => {
           :class="[
             'px-4 py-2 rounded-full border font-medium transition cursor-pointer',
             selectedCountry === country.code
-              ? 'bg-blue-600 border-blue-600 shadow'
+              ? 'bg-blue-600 border-blue-600 shadow text-white'
               : 'bg-white text-blue-700 border-blue-300 hover:bg-blue-50',
-            selectedCountry === country.code
-              ? 'bg-gray-100 text-gray-900'
-              : 'text-gray-900',
           ]"
         >
           {{ country.name }}
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-2 justify-center mb-8">
+        <button
+          v-for="cat in categories"
+          :key="cat"
+          @click="handleCategoryClick(cat)"
+          :class="[
+            'px-3 py-1 rounded-full border font-medium transition cursor-pointer text-xs',
+            selectedCategory === cat
+              ? 'text-white border-green-600 shadow bg-green-600'
+              : 'bg-white text-green-700 border-green-300 hover:bg-green-50',
+          ]"
+        >
+          {{ cat.charAt(0).toUpperCase() + cat.slice(1) }}
         </button>
       </div>
       <h1 class="text-2xl font-medium mb-6 text-center text-myPrimaryLinkColor">
