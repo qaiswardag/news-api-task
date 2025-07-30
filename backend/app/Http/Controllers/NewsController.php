@@ -22,6 +22,12 @@ class NewsController extends Controller
         $key = config('services.newsdata.key');
         $url = config('services.newsurl.key');
 
+        $cacheKey = 'news:index:' . $request->country . ':lang:' . $request->language . ':cat:' . md5($request->category ?? '');
+        $cached = cache()->get($cacheKey);
+        if ($cached) {
+            return response()->json($cached);
+        }
+
         $response = Http::get($url, [
             'apikey' => $key,
             'country' => $request->country,
@@ -36,9 +42,14 @@ class NewsController extends Controller
             ], 500);
         }
 
-        return response()->json([
+        $result = [
             'data' => $response->json()['results'] ?? [],
-        ]);
+        ];
+
+        // Cache for 10 minutes
+        cache()->put($cacheKey, $result, 600);
+
+        return response()->json($result);
     }
 
     /**
@@ -99,6 +110,12 @@ class NewsController extends Controller
             $params['page'] = $nextPageToken;
         }
 
+        $cacheKey = 'news:' . $countryCode . ':page:' . ($nextPageToken ?? '1') . ':cat:' . md5(implode(',', $categories));
+        $cached = cache()->get($cacheKey);
+        if ($cached) {
+            return response()->json($cached);
+        }
+
         $response = Http::get($url, $params);
 
         if ($response->failed()) {
@@ -110,11 +127,16 @@ class NewsController extends Controller
 
         $json = $response->json();
 
-        return response()->json([
+        $result = [
             'country'  => $countryCode,
             'nextPage' => $json['nextPage'] ?? null,
             'data'     => $json['results'] ?? [],
-        ]);
+        ];
+
+        // Cache for 10 minutes
+        cache()->put($cacheKey, $result, 600);
+
+        return response()->json($result);
     }
 
 
