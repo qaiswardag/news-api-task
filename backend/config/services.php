@@ -18,6 +18,13 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
+    'newsdata' => [
+        'key' => env('NEWSDATA_API_KEY'),
+    ],
+    'newsurl' => [
+        'key' => env('NEWSDATA_URL'),
+    ],
+
     'resend' => [
         'key' => env('RESEND_KEY'),
     ],

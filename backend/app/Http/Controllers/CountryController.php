@@ -36,6 +36,13 @@ class CountryController extends Controller
      */
     public function show(string $code)
     {
+
+        if (!preg_match('/^[a-z]{2}$/i', $code)) {
+            return response()->json([
+                'message' => 'Invalid country code format. Must be 2 letters.'
+            ], 422);
+        }
+
         $country = Country::where('code', $code)->with('languages')->first();
 
         if (!$country) {
